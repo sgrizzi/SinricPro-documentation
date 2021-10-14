@@ -1,3 +1,5 @@
+# Part 2 - Adding a button for local control
+
 # Sending feedback to the SinricPro Server
 Let's say you want to control your device locally by turning it on and off with a push button.<br/>
 When the device power state changes, we need to inform the SinricPro Server about this state change.<br/>
