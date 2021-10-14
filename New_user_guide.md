@@ -16,17 +16,19 @@ class MySwitch : public SinricProSwitch {
 
 ### Define a new constructor
 Our constructor needs at least the `deviceId` and must initialize the inherited `SinricProSwitch` constructor with that id.<br/>
-In this example, we will give our new class a variable `pin` and initialize this by the constructor's `pin` parameter.<br/>
+In this example, we will give our new class a variable `switch_pin` and initialize this by the constructor's `switch_pin` parameter.<br/>
 Inside the constructer we use the pin variable to set the `pinMode` to `OUTPUT`:
 ```C++
 class MySwitch : public SinricProSwitch {
   public:
-    MySwitch(const String& deviceId, int pin) : SinricProSwitch(deviceId), pin(pin) {
-      pinMode(pin, OUTPUT);
+    MySwitch(const String& deviceId, int switch_pin) 
+    : SinricProSwitch(deviceId)
+    , switch_pin(switch_pin) {
+      pinMode(switch_pin, OUTPUT);
     }
     
   protected:
-    int pin;
+    int switch_pin;
 };
 ```
 
@@ -39,22 +41,24 @@ turning a pin on or off, we will return the value `true`.
 ```C++
 class MySwitch : public SinricProSwitch {
   public:
-    MySwitch(const String& deviceId, int pin) : SinricProSwitch(deviceId), pin(pin) {
-      pinMode(pin, OUTPUT);
+    MySwitch(const String& deviceId, int switch_pin) 
+    : SinricProSwitch(deviceId)
+    , switch_pin(switch_pin) {
+      pinMode(switch_pin, OUTPUT);
     }
     
     bool onPowerState(bool& state) override {
-      digitalWrite(pin, state);
+      digitalWrite(switch_pin, state);
       return true;
     }
     
   protected:
-    int pin;
+    int switch_pin;
 };
 ```
 
 ### Create an instance from our class
-Create a new instance `mySwitch` from our class and initialize the `deviceId` and the `pin`.<br/>
+Create a new instance `mySwitch` from our class and initialize the `deviceId` and the `switch_pin`.<br/>
 For this example we will use pin (gpio) number 13.<br/>
 **Note**: *you have to create a new Switch device in SinricPro portal.*<br/>
 *After you created the device you will get the deviceId and additionally the App Key and App Secret which is needed later.*<br/>
@@ -119,17 +123,19 @@ This is how our finals sketch looks now:
 
 class MySwitch : public SinricProSwitch {
   public:
-    MySwitch(const String& deviceId, int pin) : SinricProSwitch(deviceId), pin(pin) {
-      pinMode(pin, OUTPUT);
+    MySwitch(const String& deviceId, int switch_pin) 
+    : SinricProSwitch(deviceId)
+    , switch_pin(switch_pin) {
+      pinMode(switch_pin, OUTPUT);
     }
     
     bool onPowerState(bool& state) override {
-      digitalWrite(pin, state);
+      digitalWrite(switch_pin, state);
       return true;
     }
     
   protected:
-    int pin;
+    int switch_pin;
 };
 
 MySwitch mySwitch("your-device-id-here", 13);
@@ -168,4 +174,90 @@ MySwitch mySwitch1("device_id_1", 13);
 MySwitch mySwitch2("device_id_2", 14);
 MySwitch mySwitch3("device_id_3", 15);
 ```
-**Note**: *Replace the placeholder deviceId `device_id_1` etc. with the device ID you received from the portal.*
+**Note**: *Replace the placeholders `device_id_1`, `device_id_2` and `device_id_3` with the device IDs you received from the portal.*<br/>
+
+# Sending feedback to the SinricPro Server
+Let's say you want to control your device locally by turning it on and off with a push button.<br/>
+For the following example, we assume a push button is connected to the ESP via a pull-down resistor.<br/>
+When the button is pressed `digitalRead` will return `true` and return `false` when the button is not pressed.<br/>
+
+## Extending our class
+We extend our class with the pin for the pushbutton:
+```C++
+class MySwitch : public SinricProSwitch {
+  public:
+    MySwitch(const String& deviceId, int switch_pin, int button_pin) 
+    : SinricProSwitch(deviceId)
+    , switch_pin(switch_pin)
+    , button_pin(button_pin) {
+      pinMode(switch_pin, OUTPUT);
+      pinMode(button_pin, INPUT);
+    }
+    
+    bool onPowerState(bool& state) override {
+      digitalWrite(switch_pin, state);
+      return true;
+    }
+    
+  protected:
+    int switch_pin;
+    int button_pin;
+};
+```
+
+## Adding a helper function
+Each SinricPro device have functions to send events to the Server.<br/>
+A SinricProSwitch offers the function `sendPowerStateEvent()` to send the current power state of our device.<br/>
+It takes a `bool` as parameter with the meaning `true`: the device has been turned on and `false`: the device has been turned off.<br/>
+To keep the code clean, we add a helper function `toggle()` to our class which will flip the `switch_pin` and send a powerState event to the SinricPro server<br/>
+
+```C++
+void toggle() {
+  bool newSwitchState = !digitalRead(switch_pin);
+  digitalWrite(switch_pin, newSwitchState);
+  sendPowerStateEvent(newSwitchState);
+}
+```
+
+<details><summary>Our class now looks like this (click to expand)</summary>
+  
+```C++
+class MySwitch : public SinricProSwitch {
+  public:
+    MySwitch(const String& deviceId, int switch_pin, int button_pin) 
+    : SinricProSwitch(deviceId)
+    , switch_pin(switch_pin)
+    , button_pin(button_pin) {
+      pinMode(switch_pin, OUTPUT);
+      pinMode(button_pin, INPUT);
+    }
+    
+    bool onPowerState(bool& state) override {
+      digitalWrite(switch_pin, state);
+      return true;
+    }
+    
+    void toggle() {
+      bool newSwitchState = !digitalRead(switch_pin);
+      digitalWrite(switch_pin, newSwitchState);
+      sendPowerStateEvent(newSwitchState);
+    }
+    
+  protected:
+    int switch_pin;
+    int button_pin;
+};
+```
+  
+</details>
+
+## Reading the button state
+
+To read the button state continuously, we override the `loop()` function provided by each SinricPro device.<br/>
+This function is automatically called by the SinricPro library on each pass of the main `loop()` function.<p>
+Since buttons have the annoying property to bounce, we have to debounce the button by software.<br/>
+The easiest way to do this is to wait a few milliseconds after detecting a change of state on the button pin.<br/>
+Waiting here does not mean to use the function `delay()`, because it blocks our sketch.<br/>
+We use the concept "wait without delay" which is derived from the concept "[blink without delay](https://www.arduino.cc/en/Tutorial/BuiltInExamples/BlinkWithoutDelay)".<br/>
+If you're not familiar with this concept, take a break and click the link above.<p>
+... to be continued
