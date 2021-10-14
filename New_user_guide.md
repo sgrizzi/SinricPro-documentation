@@ -60,13 +60,13 @@ class MySwitch : public SinricProSwitch {
 ### Create an instance from our class
 Create a new instance `mySwitch` from our class and initialize the `deviceId` and the `switch_pin`.<br/>
 For this example we will use pin (gpio) number 13.<br/>
-**Note**: *you have to create a new Switch device in SinricPro portal.*<br/>
-*After you created the device you will get the deviceId and additionally the App Key and App Secret which is needed later.*<br/>
-*Replace the placeholder deviceId `your-device-id-here` with the deivce ID you got from the portal.*
 ```C++
 MySwitch mySwitch("your-device-id-here", 13);
 
 ```
+**Note**: *You have to create a new Switch device in SinricPro portal.*<br/>
+*After you created the device you will get the deviceId and additionally the App Key and App Secret which is needed later.*<br/>
+*Replace the placeholder `your-device-id-here` with the deivce ID you received from the portal.*
 
 ## Setting up the WiFi connection
 Of course we need the WiFi functionality. For this we use the "good old" standard wifi initialization code.<br/>
