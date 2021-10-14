@@ -177,4 +177,5 @@ MySwitch mySwitch3("device_id_3", 15);
 **Note**: *Replace the placeholders `device_id_1`, `device_id_2` and `device_id_3` with the device IDs you received from the portal.*<br/>
 <hr>
 
-[Part 2 - Adding a button for local control](part_2.md)
+[Part 2 - Adding a button for local control](part_2.md)<br/>
+[Part 3 - Organizing the project](part_3.md)<br/>
