@@ -251,4 +251,5 @@ void loop() {
 ```
 <hr>
   
-[Part 1 - A simple switch device](part_1_md)
+[Part 1 - A simple switch device](part_1.md)<br/>
+[Part 3 - Organizing the project](part_3.md)<br/>
