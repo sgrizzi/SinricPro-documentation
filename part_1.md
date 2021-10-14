@@ -1,4 +1,4 @@
-# New User Guide
+# Part 1 - A simple switch device
 
 ## Include Files
 
