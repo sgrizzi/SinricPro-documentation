@@ -58,7 +58,7 @@ Create a new instance `mySwitch` from our class and initialize the `deviceId` an
 For this example we will use pin (gpio) number 13.<br/>
 **Note**: *you have to create a new Switch device in SinricPro portal.*<br/>
 *After you created the device you will get the deviceId and additionally the App Key and App Secret which is needed later.*<br/>
-*Replace `your-device-id-here` with the deivce ID you got from the portal.*
+*Replace the placeholder deviceId `your-device-id-here` with the deivce ID you got from the portal.*
 ```C++
 MySwitch mySwitch("your-device-id-here", 13);
 
@@ -160,12 +160,12 @@ void loop() {
 ```
 
 # How to run multiple Switch devices?
-Since we can simply reuse our class, this is a very simple task<br/>
-First we need additional deviceId's. Visit the protal and create new Switch devices and note their deviceId's<br/>
-Then create new instances from our class like so:
+Since we can reuse our class, this is a very simple task<br/>.
+First, we need additional deviceId's. Visit the SinricPro portal and create a few more switch devices and note their deviceId's<br/>.
+Then create new instances of our class like so:
 ```C++
 MySwitch mySwitch1("device_id_1", 13);
 MySwitch mySwitch2("device_id_2", 14);
 MySwitch mySwitch3("device_id_3", 15);
 ```
-**Note**: *Change the deviceId's to the ones you got from the portal and modify the pin numbers to your need*
+**Note**: *Replace the placeholder deviceId `device_id_1` etc. with the device ID you received from the portal.*
