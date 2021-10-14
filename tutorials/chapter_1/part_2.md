@@ -249,3 +249,6 @@ void loop() {
   SinricPro.handle();
 }
 ```
+<hr>
+  
+[Part 1 - A simple switch device](part_1_md)
